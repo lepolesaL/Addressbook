@@ -1,0 +1,106 @@
+<!-- <div class="row" *ngIf="showForm else addressbookList"> -->
+<div class="row">
+  <div id="addContact-form-div">
+    <div id="form-title">
+      <h3>Add your contact information</h3>
+    </div>
+    <div *ngIf="apiError" class="alert alert-danger">
+        <p> {{apiErrorMessage}}</p>
+    </div>
+    <form [formGroup]="addressbookform" novalidate id="addressbookform" (ngSubmit)="addContact(addressbookform)">
+      <div class="formGroup">
+        <label>Name:</label>
+        <input type="text" class="form-control" formControlName="name">
+      </div>
+
+      <div *ngIf="name.invalid && (name.dirty || name.touched)" class="alert alert-danger">
+        <div *ngIf="name.errors.required">
+          Name is required.
+        </div>
+        <div *ngIf="name.errors.minlength">
+          Name must be at least 4 characters.
+        </div>
+
+        <div *ngIf="name.errors.maxlength">
+          Name must not exceed 25 characters.
+        </div>
+      </div>
+
+      <div class="formGroup">
+        <label>Email address:</label>
+        <input type="text" class="form-control" formControlName="email" required>
+      </div>
+      <div *ngIf="email.invalid && (email.dirty || email.touched)" class="alert alert-danger">
+
+        <div *ngIf="email.errors.required">
+          Name is required.
+        </div>
+        <div *ngIf="email.errors.email && email.value.length > 0">
+          Email address is invalid.
+        </div>
+      </div>
+
+      <div class="formGroup">
+        <label>Phone number:</label>
+        <input type="text" class="form-control" formControlName="phonenumber">
+      </div>
+      <div *ngIf="phonenumber.invalid && (phonenumber.dirty || phonenumber.touched)" class="alert alert-danger">
+        <div *ngIf="phonenumber.errors.required">
+          Phone number is required.
+        </div>
+        <div *ngIf="phonenumber.errors.minlength">
+          Phone number must be at least 10 characters.
+        </div>
+
+        <div *ngIf="phonenumber.errors.maxlength">
+          Phone number must not exceed 12 characters.
+        </div>
+      </div>
+
+      <fieldset class="form-group" formGroupName="address">
+        <label>Street:</label>
+        <input type="text" class="form-control" formControlName="street">
+        <div *ngIf="street.invalid && (street.dirty || street.touched)" class="alert alert-danger">
+          <div *ngIf="street.errors.required">
+            Street is required.
+          </div>
+          <div *ngIf="street.errors.minlength">
+            Street must be at least 4 characters.
+          </div>
+          <div *ngIf="street.errors.maxlength">
+            Street must not exceed 50 characters.
+          </div>
+        </div>
+
+        <label>City:</label>
+        <input type="text" class="form-control" formControlName="city">
+        <div *ngIf="city.invalid && (city.dirty || city.touched)" class="alert alert-danger">
+          <div *ngIf="city.errors.required">
+            City is required.
+          </div>
+          <div *ngIf="city.errors.minlength">
+            City must be at least 4 characters.
+          </div>
+          <div *ngIf="city.errors.maxlength">
+            City must not exceed 25 characters.
+          </div>
+        </div>
+
+
+        <label>Country:</label>
+        <input type="text" class="form-control" formControlName="country">
+        <div *ngIf="country.invalid && (country.dirty || country.touched)" class="alert alert-danger">
+          <div *ngIf="country.errors.required">
+            ZipCode is required.
+          </div>
+          <div *ngIf="country.errors.minlength || country.errors.maxlength">
+            ZipCode must be 2 characters.
+          </div>
+        </div>
+
+      </fieldset>
+
+      <button type="submit" class="btn btn-primary form-control" >Submit</button>
+    </form>
+  </div>
+</div>
