@@ -6,6 +6,7 @@ import { of } from 'rxjs/observable/of';
 import 'rxjs/add/operator/map'
 import { CONTACTS } from './shared/mockdata'
 import { Contact, ApiError } from './shared/contact';
+import { SERVER_API_URL } from './app.constants';
 
 
 @Injectable()
@@ -25,10 +26,11 @@ export class AddressbookApiClientService {
   }
 
   addContact(contact: any): Observable<any> {
+    console.log(SERVER_API_URL);
     let body = JSON.stringify(contact);            
     let headers = new Headers({ 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.post('http://localhost:8080/addressbook/contact', body, options).map(data => {return <ApiError> data.json()});
+    return this.http.post(SERVER_API_URL+'/addressbook/contact', body, options).map(data => {return <ApiError> data.json()});
   }
 
   editContact(contact: Contact): Observable<any> {

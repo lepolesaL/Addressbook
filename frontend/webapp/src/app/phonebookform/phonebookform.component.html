@@ -55,6 +55,10 @@
         <div *ngIf="phonenumber.errors.maxlength">
           Phone number must not exceed 12 characters.
         </div>
+
+        <div *ngIf="phonenumber.errors.pattern">
+            Phone number must contain only numeric characters.
+          </div>
       </div>
 
       <fieldset class="form-group" formGroupName="address">
@@ -87,7 +91,7 @@
         </div>
 
 
-        <label>Country:</label>
+        <label>Country Code:</label>
         <input type="text" class="form-control" formControlName="country">
         <div *ngIf="country.invalid && (country.dirty || country.touched)" class="alert alert-danger">
           <div *ngIf="country.errors.required">

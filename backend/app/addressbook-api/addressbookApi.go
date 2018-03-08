@@ -64,8 +64,8 @@ type Server struct {
 
 // Contact validation
 func (c *Contact) validate() bool {
-	re := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
-
+	regEmail := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+	regPhoneNumber :=regexp.MustCompile("^[0-9]*$")
 	if c.Name == "" || c.Email == "" || c.PhoneNumber == "" || (Address{}) == c.Address {
 		return false
 	}
@@ -73,7 +73,7 @@ func (c *Contact) validate() bool {
 		return false
 	} 
 
-	if  len(c.Address.Street) > 4 || len(c.Address.Street) < 50 || len(c.Address.City) > 4 || len(c.Address.City) < 25 {
+	if  len(c.Address.Street) < 4 || len(c.Address.Street) > 50 || len(c.Address.City) < 4 || len(c.Address.City) > 25 {
 		return false
 	}
 
@@ -81,7 +81,11 @@ func (c *Contact) validate() bool {
 		return false
 	}
 
-	if !re.MatchString(c.Email) {
+	if !regEmail.MatchString(c.Email) {
+		return false
+	}
+
+	if !regPhoneNumber.MatchString(c.PhoneNumber) {
 		return false
 	}
 
@@ -120,7 +124,7 @@ func (a *AddressBook) setContact(client RedisClient, contact Contact, cmd int) (
 		}
 		return true, SUCCESS
 	}
-	log.Printf("Contact is not supposed to be null")
+	log.Printf("Contact could be null or invalid")
 	return false, IMPL_ERR
 
 }

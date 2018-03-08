@@ -1,7 +1,7 @@
 import { Component, OnInit, EventEmitter, Input, Output  } from '@angular/core';
 import { AddressbookApiClientService } from '../addressbook-api-client.service';
 
-import {  FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {  FormBuilder, FormGroup, Validators, PatternValidator } from '@angular/forms';
 import { Contact, ApiError } from '../shared/contact';
 
 @Component({
@@ -21,14 +21,13 @@ export class PhonebookformComponent implements OnInit {
     this.createForm();
   }
   ngOnInit() {
-    this.createForm();
   }
 
   createForm() {
     this.addressbookform = this.fb.group({
       name : ['', Validators.compose([Validators.required,  Validators.minLength(5),  Validators.maxLength(25)])],
       email: ['', Validators.compose([Validators.required, Validators.minLength(5), Validators.email])],
-      phonenumber: ['', Validators.compose([Validators.required, Validators.minLength(10), Validators.maxLength(12)])],
+      phonenumber: ['', Validators.compose([Validators.required, Validators.minLength(10), Validators.maxLength(12),  Validators.pattern(/^[0-9]*$/)])],
       address: this.fb.group ({
         street: ['', Validators.compose([Validators.required, Validators.minLength(4), Validators.maxLength(50)])],
         city: ['', Validators.compose([Validators.required, Validators.minLength(4), Validators.maxLength(25)])],
@@ -38,9 +37,9 @@ export class PhonebookformComponent implements OnInit {
   }
 
   ngOnChanges() {
-    //console.log("value changed: ", this.contact, this.isPut);
+    console.log("value changed: ", this.contact, this.isPut);
     if(this.contact != null) {
-
+      console.log("setting values")
       this.addressbookform.setValue({
         name : this.contact.name,
         email: this.contact.email,
