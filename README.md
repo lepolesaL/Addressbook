@@ -26,6 +26,10 @@ This is a single page application that stores contacts.
  ```
  docker-compose up
  ```
+ - After the docker containers are started, go to the following address in the browser
+ ```
+ http://localhost:4200/
+ ```
 ####Testing
 - Test frontend by navigating to frontend/webapp folder and run the following command
 ```
@@ -38,3 +42,6 @@ docker-compose build backend
 ```
 docker-compose run backend go test -v ./addressbook-api
 ```
+
+##NOTE
+This app is not yet scalable since there is no load balancing in place.
