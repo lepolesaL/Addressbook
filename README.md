@@ -30,7 +30,7 @@ This is a single page application that stores contacts.
  ```
  http://localhost:4200/
  ```
-####Testing
+#### Testing
 - Test frontend by navigating to frontend/webapp folder and run the following command
 ```
 ng test
