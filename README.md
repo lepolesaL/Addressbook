@@ -43,5 +43,5 @@ docker-compose build backend
 docker-compose run backend go test -v ./addressbook-api
 ```
 
-##NOTE
+## NOTE
 This app is not yet scalable since there is no load balancing in place.
