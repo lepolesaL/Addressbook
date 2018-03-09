@@ -11,6 +11,9 @@ import (
 	"bytes"
 	"log"
 	"io/ioutil"
+	s "app/addressbookserver"
+	d "app/dao"
+	c "app/contact"
 )
 
 // Error responses from rest api calls
@@ -29,7 +32,7 @@ type FakeRedisError struct {
 
 }
 
-var server Server 
+var server s.Server 
 
 func (e FakeRedisError) Error() string {
 	return "Error"
@@ -58,9 +61,9 @@ func (c *RedisFakeClient) Keys(pattern string) *redis.StringSliceCmd {
 // ************* Test interaction with redis datastore using fakeRedis client *************
 func TestSetContact(t *testing.T) {
 	var client *RedisFakeClient
-	addressbook := AddressBook{}
-	contact := Contact{"Jonas","jonas@example.com", "0791234567", Address{"12 Fake Street", "Fake City", "FA"}}
-	ok, errorCode := addressbook.setContact(client, contact, 1);
+	addressbook := d.AddressBook{}
+	contact := c.Contact{"Jonas","jonas@example.com", "0791234567", c.Address{"12 Fake Street", "Fake City", "FA"}}
+	ok, errorCode := addressbook.SetContact(client, contact, 1);
 	if !ok {
 		t.Fail()
 	}
@@ -69,9 +72,9 @@ func TestSetContact(t *testing.T) {
 
 func TestGetContact(t *testing.T) {
 	var client *RedisFakeClient
-	contact := Contact{"Jone","jone@example.com", "0791234567", Address{"12 Fake Street", "Fake City", "FA"}}
-	addressbook := AddressBook{}
-	val, ok := addressbook.getContact(client, "jone@example.com")
+	contact := c.Contact{"Jone","jone@example.com", "0791234567", c.Address{"12 Fake Street", "Fake City", "FA"}}
+	addressbook := d.AddressBook{}
+	val, ok := addressbook.GetContact(client, "jone@example.com")
 	if ok {
 		if val.Name != contact.Name {
 			t.Errorf("Expected contact names to be equal")
@@ -85,8 +88,8 @@ func TestGetContact(t *testing.T) {
 
 func TestDeleteContact(t *testing.T) {
 	var client *RedisFakeClient
-	addressbook := AddressBook{}
-	ok,_,_ := addressbook.deleteContact(client, "jone@example.com")
+	addressbook := d.AddressBook{}
+	ok,_,_ := addressbook.DeleteContact(client, "jone@example.com")
 	if ok {
 		t.Logf("Can delete contact")
 	} else {
@@ -97,30 +100,30 @@ func TestDeleteContact(t *testing.T) {
 // ************** Test Server rest api *************
 func TestMain(m *testing.M) {
 	var client *RedisFakeClient
-    server = Server{}
+    server = s.Server{}
 	server.Init(client)
-	server.handleRequest()
+	server.HandleRequest()
     code := m.Run()
     os.Exit(code)
 }
 // Execute http request and records the response from server
-func executeRequest(method string, path string, contact Contact) *httptest.ResponseRecorder {
+func executeRequest(method string, path string, contact c.Contact) *httptest.ResponseRecorder {
 	response := httptest.NewRecorder()
-	if (Contact{})==contact {
+	if (c.Contact{})==contact {
 		req, _ := http.NewRequest(method, path, nil)
-		server.router.ServeHTTP(response, req)
+		server.GetRouter().ServeHTTP(response, req)
 	}  else {
 		payload,_:= json.Marshal(contact)
 		req, _ := http.NewRequest(method, path, bytes.NewBuffer(payload))
-		server.router.ServeHTTP(response, req)
+		server.GetRouter().ServeHTTP(response, req)
 	}
 	return response
 }
 
 func TestRestApiGetContact(t *testing.T) {
-	response := executeRequest("GET", "/addressbook/contact/jone@example.com", Contact{})
+	response := executeRequest("GET", "/addressbook/contact/jone@example.com", c.Contact{})
 	body, _ := ioutil.ReadAll(response.Body)
-	var contact Contact
+	var contact c.Contact
 	if err := json.Unmarshal([]byte(string(body)), &contact); err != nil {
 		t.Error("Invalid response")
 	}
@@ -132,7 +135,7 @@ func TestRestApiGetContact(t *testing.T) {
 
 
 func TestRestApiCreateContact(t *testing.T) {
-	contact := Contact{"Jona","jona@example.com", "0791234567", Address{"12 Fake Street", "Fake City", "FA"}}
+	contact := c.Contact{"Jona","jona@example.com", "0791234567", c.Address{"12 Fake Street", "Fake City", "FA"}}
 	response := executeRequest("POST", "/addressbook/contact", contact)
 	body, _ := ioutil.ReadAll(response.Body)
 	var fakeApiError FakeApiError
@@ -145,7 +148,7 @@ func TestRestApiCreateContact(t *testing.T) {
 }
 
 func TestRestApiUpdateContact(t *testing.T) {
-	contact := Contact{"Jone","jone@example.com", "0791234567", Address{"12 Fake Street", "Fake City", "FA"}}
+	contact := c.Contact{"Jone","jone@example.com", "0791234567", c.Address{"12 Fake Street", "Fake City", "FA"}}
 	response := executeRequest("PUT", "/addressbook/contact/jone@example.com", contact)
 	body, _ := ioutil.ReadAll(response.Body)
 	var fakeApiError FakeApiError
@@ -158,7 +161,7 @@ func TestRestApiUpdateContact(t *testing.T) {
 }
 
 func TestApiGetContacts(t *testing.T) {
-	response := executeRequest("GET", "/addressbook/contact", Contact{})
+	response := executeRequest("GET", "/addressbook/contact", c.Contact{})
 	body, _ := ioutil.ReadAll(response.Body)
 	log.Println(string(body))
 	if contacts := response.Body.String(); contacts == "[]" {
@@ -167,7 +170,7 @@ func TestApiGetContacts(t *testing.T) {
 }
 
 func TestApiDeleteContact(t *testing.T) {
-	response := executeRequest("DELETE", "/addressbook/contact/jone@example.com", Contact{})
+	response := executeRequest("DELETE", "/addressbook/contact/jone@example.com", c.Contact{})
 	body, _ := ioutil.ReadAll(response.Body)
 	var fakeApiError FakeApiError
 	if err := json.Unmarshal([]byte(string(body)), &fakeApiError); err != nil {

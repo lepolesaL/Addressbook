@@ -25,7 +25,7 @@ export class PhonebookformComponent implements OnInit {
 
   createForm() {
     this.addressbookform = this.fb.group({
-      name : ['', Validators.compose([Validators.required,  Validators.minLength(5),  Validators.maxLength(25)])],
+      name : ['', Validators.compose([Validators.required,  Validators.minLength(4),  Validators.maxLength(25)])],
       email: ['', Validators.compose([Validators.required, Validators.minLength(5), Validators.email])],
       phonenumber: ['', Validators.compose([Validators.required, Validators.minLength(10), Validators.maxLength(12),  Validators.pattern(/^[0-9]*$/)])],
       address: this.fb.group ({
